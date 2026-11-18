@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Full details of one event and its sessions (read-only for attendees).
+    The star in the toolbar adds / removes the event from the favourites (feature h).
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:EventManagerAttendee.Models"
+             x:Class="EventManagerAttendee.Views.EventDetailPage"
+             x:DataType="models:EventModel"
+             Title="Event details"
+             BackgroundColor="#FEF7FF">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="{Binding StarIcon}" Clicked="OnStarClicked" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12" Spacing="12">
+
+            <!-- ===== Event information ===== -->
+            <Border Padding="16" BackgroundColor="#F8F2F9" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{Binding TypeAndStatus}" FontSize="12" FontAttributes="Bold" TextColor="#00639A" />
+                    <Label Text="{Binding Name}" FontSize="22" FontAttributes="Bold" TextColor="#1D1B20" />
+                    <Label Text="{Binding DateTimeText, StringFormat='📅  {0}'}" FontSize="15" TextColor="#1D1B20" />
+                    <Label Text="{Binding Location, StringFormat='📍  {0}'}" FontSize="15" TextColor="#424654" />
+                    <Label Text="{Binding Organiser, StringFormat='👤  {0}'}" FontSize="15" TextColor="#424654" />
+                    <Label Text="{Binding Attendees, StringFormat='👥  {0} expected attendees'}"
+                           FontSize="15" TextColor="#424654" />
+                    <Label Text="{Binding ContactText, StringFormat='✉  {0}'}" FontSize="15" TextColor="#424654"
+                           IsVisible="{Binding HasContact}" />
+                    <Label Text="{Binding Description}" FontSize="15" TextColor="#1D1B20" Margin="0,6,0,0"
+                           IsVisible="{Binding HasDescription}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ===== Sessions ===== -->
+            <Label Text="{Binding SessionsHeader}" FontSize="18" FontAttributes="Bold" TextColor="#1D1B20" />
+
+            <Label Text="No sessions have been added to this event yet."
+                   TextColor="#424654" IsVisible="{Binding HasNoSessions}" />
+
+            <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Sessions}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:SessionModel">
+                        <Border Padding="14,10" BackgroundColor="#F8F2F9" StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <Border BackgroundColor="#DAE2FF" StrokeThickness="0" Padding="10,4"
+                                        VerticalOptions="Start">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Time}" FontAttributes="Bold" TextColor="#0041A2" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#1D1B20" />
+                                    <Label Text="{Binding TypeLabel}" FontSize="12" FontAttributes="Bold" TextColor="#00639A" />
+                                    <Label Text="{Binding MetaText}" FontSize="14" TextColor="#424654"
+                                           IsVisible="{Binding HasMeta}" />
+                                    <Label Text="{Binding Description}" FontSize="14" TextColor="#424654"
+                                           IsVisible="{Binding HasDescription}" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

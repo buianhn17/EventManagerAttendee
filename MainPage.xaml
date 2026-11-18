@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Event list for attendees - coursework features (g) and (h).
+    Top: search bar (name or date), "on date" filter, Favourites switch.
+    Middle: message when offline, number of events.
+    List: one card per event with a star button; tap a card to see its details and sessions.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:EventManagerAttendee.ViewModels"
+             xmlns:models="clr-namespace:EventManagerAttendee.Models"
+             x:Class="EventManagerAttendee.MainPage"
+             x:DataType="vm:EventsViewModel"
+             Title="Events"
+             BackgroundColor="#FEF7FF">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Refresh" Command="{Binding LoadCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="12,8,12,0" RowSpacing="8">
+
+        <!-- ===== Search by name or date (feature g) ===== -->
+        <SearchBar Grid.Row="0"
+                   Placeholder="Search by event name or date (dd/MM/yyyy)"
+                   Text="{Binding SearchText}" />
+
+        <!-- ===== Date filter + Favourites switch ===== -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="4">
+            <CheckBox Grid.Column="0" IsChecked="{Binding FilterByDate}" VerticalOptions="Center"
+                      SemanticProperties.Description="Only show events on the selected date" />
+            <Label Grid.Column="1" Text="On date" VerticalOptions="Center" />
+            <DatePicker Grid.Column="2" Date="{Binding SelectedDate}" Format="dd/MM/yyyy"
+                        IsEnabled="{Binding FilterByDate}" VerticalOptions="Center" />
+            <Button Grid.Column="3"
+                    Text="{Binding FavouritesButtonText}"
+                    Command="{Binding ToggleFavouritesFilterCommand}"
+                    BackgroundColor="#DAE2FF" TextColor="#001847"
+                    CornerRadius="20" Padding="14,0" HeightRequest="40"
+                    SemanticProperties.Description="Show only favourite events" />
+        </Grid>
+
+        <!-- ===== Offline / error message and event count ===== -->
+        <VerticalStackLayout Grid.Row="2" Spacing="6">
+            <Border IsVisible="{Binding HasMessage}" BackgroundColor="#FFF4E5"
+                    StrokeThickness="0" Padding="12,8">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Label Text="{Binding MessageText}" TextColor="#663C00" FontSize="13" />
+            </Border>
+            <Label Text="{Binding StatusText}" FontSize="13" TextColor="#424654" />
+        </VerticalStackLayout>
+
+        <!-- ===== Event list (pull down to refresh) ===== -->
+        <RefreshView Grid.Row="3" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCommand}">
+            <CollectionView ItemsSource="{Binding Events}" SelectionMode="None">
+
+                <CollectionView.EmptyView>
+                    <Label Text="{Binding EmptyText}" HorizontalTextAlignment="Center"
+                           TextColor="#424654" Margin="24,40" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:EventModel">
+                        <Border Margin="0,6" Padding="14,12" BackgroundColor="#F8F2F9" StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="18" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnEventTapped" />
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="{Binding TypeAndStatus}" FontSize="12"
+                                           FontAttributes="Bold" TextColor="#00639A" />
+                                    <Label Text="{Binding Name}" FontSize="17" FontAttributes="Bold"
+                                           TextColor="#1D1B20" LineBreakMode="TailTruncation" MaxLines="2" />
+                                    <Label Text="{Binding DateTimeText}" FontSize="14" TextColor="#1D1B20" />
+                                    <Label Text="{Binding Location}" FontSize="14" TextColor="#424654"
+                                           LineBreakMode="TailTruncation" />
+                                    <Label Text="{Binding OrganiserAndSessions}" FontSize="13" TextColor="#424654" />
+                                </VerticalStackLayout>
+
+                                <!-- Feature (h): favourite star -->
+                                <Button Grid.Column="1" Text="{Binding StarIcon}" Clicked="OnStarClicked"
+                                        FontSize="28" TextColor="#F5A623" BackgroundColor="Transparent"
+                                        WidthRequest="52" HeightRequest="52" Padding="0"
+                                        VerticalOptions="Start"
+                                        SemanticProperties.Description="Add or remove from favourites" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Spinner while the first download is running -->
+        <ActivityIndicator Grid.Row="3" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                           Color="#0041A2" VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

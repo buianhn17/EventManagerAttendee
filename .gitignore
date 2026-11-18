@@ -1,0 +1,13 @@
+# Build output
+bin/
+obj/
+
+# Editor / IDE settings that belong to one computer
+.vs/
+*.user
+*.suo
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
